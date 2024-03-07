@@ -83,22 +83,29 @@ def GenerateHeaderDict(version: int, click_events: bool = False, cont_signal: in
     }
 
 
+def GenerateLine(instances: List[Module]) -> str:
+    out = "["
+
+    for instance in instances:
+        out += json.dumps(GenerateModuleDict(instance)) + ','
+    out = out.strip(',')
+
+    out += "]"
+
+    return out
+
 def Init(instances: List[Module]):
     for instance in instances:
         instance.init(instance)
 
     print(json.dumps(GenerateHeaderDict(config.VERSION, config.CLICK_EVENTS, config.SIGCONT, config.SIGSTOP)))
-    print('[')
+    print('[' + GenerateLine(instances))
+    sys.stdout.flush()
 
 
 def Update(instances: List[Module]):
-    out_str = '['
-
     for instance in instances:
         instance.update(instance)
-        out_str += json.dumps(GenerateModuleDict(instance)) + ','
 
-    out_str = out_str.removesuffix(',')
-    out_str += ']'
-
-    print(out_str, end='')
+    print(', ' + GenerateLine(instances))
+    sys.stdout.flush()

@@ -1,27 +1,57 @@
 import main
 
+from enum import Enum
+
+class ChargeState(Enum):
+    DISCHARGING = 0,
+    CHARGING = 1,
+    NOT_CHARGING = 2
+
+
+blink_state = False
+def Blink(module: main.Module):
+    global blink_state
+
+    if blink_state:
+        blink_state = False
+        module.settings.background = 'FF0000'
+    else:
+        blink_state = True
+        module.settings.background = 'FFFFFF'
+
 def Init(module: main.Module):
-    pass
+    module.settings.color = '000000'
 
 
 def Update(module: main.Module):
-    with open('/sys/class/power_supply/BAT0/status') as file:
-        status = file.read().strip('\n')
+    charge_state = ChargeState['NOT_CHARGING']
 
-        if status == 'Charging':
-            status_indicator = '▲ '
-        elif status == 'Discharging':
-            status_indicator = '▼ '
+    with open('/sys/class/power_supply/BAT0/status') as file:
+        status_str = file.read().strip('\n')
+
+        if status_str == 'Charging':
+            charge_status_indicator = '▲'
+            charge_state = ChargeState.CHARGING
+        elif status_str == 'Discharging':
+            charge_status_indicator = '▼'
+            charge_state = ChargeState.DISCHARGING
         else:
-            status_indicator = '- '
+            charge_status_indicator = '-'
+            charge_state = ChargeState.NOT_CHARGING
 
 
     with open('/sys/class/power_supply/BAT0/capacity') as file:
-        battery_percentage_str = file.read().strip('\n')
+        battery_percentage = int(file.read().strip('\n'))
 
-    battery_percentage = int(battery_percentage_str)
+    if battery_percentage > 70:
+        module.settings.background = '00FF00'
+    elif battery_percentage > 40:
+        module.settings.background = 'FFFF00'
+    elif battery_percentage > 10:
+        module.settings.background = 'FF0000'
+    elif charge_state == ChargeState.DISCHARGING:
+        Blink(module)
 
-    if battery_percentage < 10:
-        module.settings.urgent = True
 
-    module.full_text = status_indicator + battery_percentage_str + '%'
+
+    module.full_text = charge_status_indicator + ' ' + str(battery_percentage) + '%'

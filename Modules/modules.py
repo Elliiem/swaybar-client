@@ -1,1 +1,1 @@
-modules = ['battery', 'date']
+modules = ['date', 'battery']

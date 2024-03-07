@@ -26,5 +26,4 @@ main.Init(instances)
 
 while True:
     main.Update(instances)
-    time.sleep(0.05)
-    print(',')
+    time.sleep(1)
