@@ -6,7 +6,6 @@ from typing import List, Callable
 import sys
 sys.path.append(config.ELEMENT_SCRIPT_PATH)
 
-
 class ModuleSettings:
     def __init__(self, color: str = "",
                 background: str = "",

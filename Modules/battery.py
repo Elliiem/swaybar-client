@@ -1,4 +1,5 @@
 import main
+import psutil
 
 from enum import Enum
 
@@ -19,8 +20,9 @@ def Blink(module: main.Module):
         blink_state = True
         module.settings.background = 'FFFFFF'
 
+
 def Init(module: main.Module):
-    module.settings.color = '000000'
+    module.settings.color = '101010'
 
 
 def Update(module: main.Module):
@@ -40,18 +42,15 @@ def Update(module: main.Module):
             charge_state = ChargeState.NOT_CHARGING
 
 
-    with open('/sys/class/power_supply/BAT0/capacity') as file:
-        battery_percentage = int(file.read().strip('\n'))
+    battery_percentage = int(psutil.sensors_battery().percent)
 
-    if battery_percentage > 70:
+    if battery_percentage >= 60:
         module.settings.background = '00FF00'
-    elif battery_percentage > 40:
+    elif battery_percentage >= 20:
         module.settings.background = 'FFFF00'
-    elif battery_percentage > 10:
+    elif battery_percentage >= 10:
         module.settings.background = 'FF0000'
     elif charge_state == ChargeState.DISCHARGING:
         Blink(module)
-
-
 
     module.full_text = charge_status_indicator + ' ' + str(battery_percentage) + '%'
