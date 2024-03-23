@@ -2,7 +2,17 @@ import main
 import datetime
 
 def Init(module: main.Module):
-    module.color = '1010101'
+    module.color = 'FFFFFF'
+
+    module.background = '802050'
+    module.border = '802050'
+
+    module.separator = False
+    module.separator_block_width = 0
+
+    module.border_left = 1
+    module.border_right = 1
+
 
 def Update(module: main.Module):
     now = datetime.datetime.now()

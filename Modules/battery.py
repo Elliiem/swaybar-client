@@ -3,6 +3,19 @@ import psutil
 
 from enum import Enum
 
+def Init(module: main.Module):
+    module.color = '101010'
+
+    module.background = '00FF00'
+    module.border = '00FF00'
+
+    module.separator = False
+    module.separator_block_width = 0
+
+    module.border_left = 1
+    module.border_right = 1
+
+
 class ChargeStatus(Enum):
     DISCHARGING = 0,
     CHARGING = 1,
@@ -32,10 +45,6 @@ def Blink(module: main.Module):
         module.background = 'FFFFFF'
 
 
-def Init(module: main.Module):
-    module.color = '101010'
-
-
 def Update(module: main.Module):
     charge_status = ChargeStatus.GetChargeStatus()
 
@@ -52,11 +61,17 @@ def Update(module: main.Module):
 
     if battery_percentage >= 60:
         module.background = '00FF00'
+        module.border = '00FF00'
     elif battery_percentage >= 20:
         module.background = 'FFFF00'
+        module.border = 'FFFF00'
     elif battery_percentage >= 10:
         module.background = 'FF0000'
+        module.border = 'FF0000'
     elif charge_status == ChargeStatus.DISCHARGING:
         Blink(module)
+    else:
+        module.background = 'FF0000'
+        module.border = 'FF0000'
 
     module.full_text = status_indicator + ' ' + str(battery_percentage) + '%'
