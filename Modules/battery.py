@@ -46,7 +46,7 @@ def Update(module: main.Module):
         case ChargeStatus.DISCHARGING:
             status_indicator = '▼'
         case ChargeStatus.NOT_CHARGING:
-            status_indicator = '-'
+            status_indicator = '🔋'
 
     battery_percentage = int(psutil.sensors_battery().percent)
 
@@ -59,4 +59,4 @@ def Update(module: main.Module):
     elif charge_status == ChargeStatus.DISCHARGING:
         Blink(module)
 
-    module.full_text = status_indicator + ' ' + str(battery_percentage) + '%'
+    module.full_text = str(battery_percentage) + '%'
