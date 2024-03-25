@@ -1,6 +1,7 @@
 import main
 import os
 from requests import get
+# not using the ipify module because it uses since python 3.8 deprecated functions
 import time
 
 def Init(module: main.Module):
@@ -18,18 +19,22 @@ def Update(module: main.Module):
         os.makedirs(os.path.dirname(last_ip_path), exist_ok=True)
         with open(last_ip_path, 'w') as file2:
             try:
-                file2.write(get('https://api64.ipify.org', timeout=2).text) 
-            except:
-                file2.write("Error")
+                response = get('https://api64.ipify.org', timeout=2)
+                response.raise_for_status()  # Raises stored HTTPError, if one occurred.
+                file2.write(response.text)
+            except Exception as e:
+                file2.write(f"An error occurred: {e}") # If an error occurred, write it to the ip file
     else:
         # If a timer is set, check if the last time the ip was checked was longer than 180 Seconds ago, if yes -> check ip    
         with open(ip_path, 'r') as file3:
             last_update = (file3.read())
-            if time.time() - float(last_update) > 180:
+            if time.time() - float(last_update) > 300:
                 try:
-                    ip = (get('https://api64.ipify.org', timeout=2).text)
-                except:
-                    ip = "Error"
+                    response = get('https://api64.ipify.org', timeout=5)
+                    response.raise_for_status()  # Raises stored HTTPError, if one occurred.
+                    ip = response.text
+                except Exception as e:
+                    ip = f"An error occurred: {e}" # If an error occurred, write it to the ip file
                 with open(ip_path, "w") as file4:
                     file4.write(str(time.time()))  # Write the current timestamp to ip_path
                 with open(last_ip_path, "w") as file5:
