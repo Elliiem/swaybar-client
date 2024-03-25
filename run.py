@@ -11,4 +11,4 @@ main.Init(instances, config)
 
 while True:
     main.Update(instances)
-    time.sleep(0.85)
+    time.sleep(1)
