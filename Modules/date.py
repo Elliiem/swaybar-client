@@ -2,16 +2,18 @@ import main
 import datetime
 
 def Init(module: main.Module):
-    module.color = 'FFFFFF'
+    module.color = '000000'
 
-    module.background = '802050'
-    module.border = '802050'
+    module.background = '600060'
+    module.border = '600060'
+
+    module.border_left = 1
+    module.border_right = 1
 
     module.separator = False
     module.separator_block_width = 0
 
-    module.border_left = 1
-    module.border_right = 1
+    module.timeout = 1.0
 
 
 def Update(module: main.Module):

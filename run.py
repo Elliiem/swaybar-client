@@ -3,9 +3,12 @@ import main
 import time
 import os
 
-config = main.Config.LoadFromPath(os.path.dirname(__file__) + '/config.json')
+config_base_dir = os.environ.get('XDG_CONFIG_HOME', '~/.config')
+config_file_path = os.path.join(config_base_dir, 'sway', 'swaybar-client.json')
 
-instances = main.LoadModules(config.module_dir)
+config = main.Config.LoadFromPath(os.path.expanduser(config_file_path))
+
+instances = main.LoadModules(config)
 
 main.Init(instances, config)
 

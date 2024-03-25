@@ -1,2 +1,2 @@
-GPUtil==1.4.0
+importlib==1.0.4
 psutil==5.9.8

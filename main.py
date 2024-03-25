@@ -1,54 +1,34 @@
 import json
 import sys
 import os
+import time
 
 from typing import List, Callable, Dict
 
 import importlib.util
 
-class HeaderConfig:
-    def __init__(self, version: str,
-                click_events: bool,
-                cont_signal: int,
-                stop_signal: int) -> None:
-
-        self.version = version
-        self.click_events = click_events
-        self.cont_signal = cont_signal
-        self.stop_signal = stop_signal
-
-    def LoadFromDict(config: Dict[str, any]) -> 'HeaderConfig':
-        return HeaderConfig(
-            version = config['version'] if 'version' in config else 1,
-            click_events = config['click_events'] if 'click_events' in config else False,
-            cont_signal = config['cont_signal'] if 'cont_signal' in config else 18,
-            stop_signal = config['stop_signal'] if 'stop_signal' in config else 19,
-        )
-
-    def LoadFromPath(path: str) -> 'HeaderConfig':
-        with open(path) as config_file:
-            config = json.load(config_file)
-
-        return HeaderConfig.LoadFromDict(config)
-
 class Config:
-    def __init__(self, module_dir: str, header_config: HeaderConfig) -> None:
+    def __init__(self, module_dir: str, modules: List[str]) -> None:
         self.module_dir = module_dir
-        self.header_config = header_config
+        self.modules = modules
 
 
     def LoadFromDict(config: Dict[str, any]) -> 'Config':
-        module_dir = config['modules_dir'] if 'modules_dir' in config else ''
+        module_dir = ''
+        if 'modules_directory' in config:
+            module_dir = config['modules_directory']
 
         if module_dir == '':
-            module_dir = os.path.dirname(__file__) + '/Modules'
+            module_dir = os.path.join(os.path.dirname(__file__), 'Modules')
 
         if not os.path.exists(module_dir):
             raise Exception("No module directory was found!")
 
+        modules = config['modules'] if 'modules' in config else []
+
         return Config(
             module_dir = module_dir,
-            header_config = HeaderConfig.LoadFromDict(config)
+            modules = modules
         )
 
     def LoadFromPath(path:str) -> 'Config':
@@ -56,23 +36,6 @@ class Config:
             config = json.load(config_file)
 
         return Config.LoadFromDict(config)
-
-
-class ModulesConfig:
-    def __init__(self, modules: Dict[str, any]) -> None:
-        self.modules = modules
-
-    def LoadFromDict(config: Dict[str, any]) -> 'ModulesConfig':
-        return ModulesConfig(
-            modules = config['modules'] if 'modules' in config else []
-        )
-
-    def LoadFromPath(path: str) -> 'ModulesConfig':
-        with open(path) as config_file:
-            config = json.load(config_file)
-
-        return ModulesConfig.LoadFromDict(config)
-
 
 class Module:
     def __init__(self,
@@ -92,7 +55,8 @@ class Module:
                 urgent: bool = False,
                 separator: bool = True,
                 separator_block_width: int = 10,
-                markup: str = 'none') -> None:
+                markup: str = 'none',
+                timeout = 1.0) -> None:
 
         self.name = name
         self.instance = instance
@@ -117,30 +81,34 @@ class Module:
         self.update = update
         self.init = init
 
+        self.timeout = timeout
+
+        self._update_time = 0
+
 
 def LoadModule(path: str, instance: int) -> any:
+    if not os.path.exists(path):
+        raise Exception(f"Module {os.path.splitext(os.path.basename(path))[0]} does not exist")
+
     spec = importlib.util.spec_from_file_location('module', path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
 
-
     return Module(module.__name__, instance, module.Update, module.Init)
 
 
-def LoadModules(path: str):
-    config: ModulesConfig = ModulesConfig.LoadFromPath(path + '/config.json')
-
+def LoadModules(config: Config):
     instance_count = {}
-
     modules = []
 
-    for module_rel_path in config.modules:
-        if module_rel_path in instance_count:
-            instance_count[module_rel_path] += 1
+    for rel_path in config.modules:
+        if rel_path in instance_count:
+            instance_count[rel_path] += 1
         else:
-            instance_count[module_rel_path] = 0
+            instance_count[rel_path] = 0
 
-        modules.append(LoadModule(path + module_rel_path + '.py', instance_count[module_rel_path]))
+        module_path = config.module_dir + rel_path + '.py'
+        modules.append(LoadModule(module_path, instance_count[rel_path]))
 
     return modules
 
@@ -167,13 +135,13 @@ def GenerateModuleDict(module: Module):
         'markup': module.markup
     }
 
-
-def GenerateHeaderDict(settings: HeaderConfig):
+#TODO Make configurable / smarter
+def GenerateHeaderDict():
     return {
-        'version': settings.version,
-        'click_events': settings.click_events,
-        'cont_signal': settings.cont_signal,
-        'stop_signal': settings.stop_signal
+        'version': 1,
+        'click_events': False,
+        'cont_signal': 18,
+        'stop_signal': 19
     }
 
 
@@ -189,14 +157,18 @@ def Init(instances: List[Module], config: Config):
     for instance in instances:
         instance.init(instance)
 
-    print(json.dumps(GenerateHeaderDict(config.header_config)))
+    print(json.dumps(GenerateHeaderDict()))
     print('[' + GenerateLine(instances))
     sys.stdout.flush()
 
 
 def Update(instances: List[Module]):
     for instance in instances:
-        instance.update(instance)
+        now = time.time()
+
+        if now - instance._update_time > instance.timeout:
+            instance.update(instance)
+            instance._update_time = now
 
     print(',' + GenerateLine(instances))
     sys.stdout.flush()

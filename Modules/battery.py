@@ -4,16 +4,16 @@ import psutil
 from enum import Enum
 
 def Init(module: main.Module):
-    module.color = '101010'
+    module.color = '323232'
 
     module.background = '00FF00'
     module.border = '00FF00'
 
-    module.separator = False
-    module.separator_block_width = 0
-
     module.border_left = 1
     module.border_right = 1
+
+    module.separator = False
+    module.separator_block_width = 0
 
 
 class ChargeStatus(Enum):
@@ -57,7 +57,7 @@ def Update(module: main.Module):
         case ChargeStatus.NOT_CHARGING:
             status_indicator = '-'
 
-    battery_percentage = int(psutil.sensors_battery().percent)
+    battery_percentage = round(psutil.sensors_battery().percent)
 
     if battery_percentage >= 60:
         module.background = '00FF00'
