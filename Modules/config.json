@@ -1,6 +1,7 @@
 {
     "modules": [
         "/date",
+        "/time",
         "/battery"
     ]
 }
