@@ -38,7 +38,10 @@ class Config:
 
 
     def LoadFromDict(config: Dict[str, any]) -> 'Config':
-        module_dir = config['modules_dir'] if 'modules_dir' in config else os.path.dirname(__file__) + '/Modules'
+        module_dir = config['modules_dir'] if 'modules_dir' in config else ''
+
+        if module_dir == '':
+            module_dir = os.path.dirname(__file__) + '/Modules'
 
         if not os.path.exists(module_dir):
             raise Exception("No module directory was found!")
