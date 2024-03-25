@@ -1,11 +1,15 @@
 import main
-import datetime
+from datetime import datetime
+from dateutil.tz import tzlocal
+
 
 def Init(module: main.Module):
     module.color = '1010101'
 
 def Update(module: main.Module):
-    now = datetime.datetime.now()
+    now = datetime.now(tzlocal())
+
+    offset = now.strftime('%z')
 
     second = str(now.second)
     second = '0' + second if len(second) < 2 else second
@@ -15,8 +19,7 @@ def Update(module: main.Module):
     hour = '0' + hour if len(hour) < 2 else hour
 
 
-    time_str = hour + ':' + minute + ':' + second
+    time_str = f"{hour}:{minute}:{second}"
 
 
-    module.full_text = "UTC +01:00" + ' ' + time_str
-
+    module.full_text = f"UTC {offset[:-2]}:{offset[-2:]}  {time_str}"
