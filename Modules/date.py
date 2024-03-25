@@ -2,16 +2,7 @@ import main
 import datetime
 
 def Init(module: main.Module):
-    module.color = 'FFFFFF'
-
-    module.background = '802050'
-    module.border = '802050'
-
-    module.separator = False
-    module.separator_block_width = 0
-
-    module.border_left = 1
-    module.border_right = 1
+    module.color = '1010101'
 
 
 def Update(module: main.Module):
@@ -23,7 +14,7 @@ def Update(module: main.Module):
     month = '0' + month if len(month) < 2 else month
     year = str(now.year)
 
-    date_str = day + '-' + month + '-' + year
+    date_str = f"{day}.{month}.{year}X"
 
     module.full_text = date_str
 
