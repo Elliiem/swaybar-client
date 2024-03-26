@@ -11,12 +11,9 @@ def Update(module: main.Module):
 
     offset = now.strftime('%z')
 
-    second = str(now.second)
-    second = '0' + second if len(second) < 2 else second
-    minute = str(now.minute)
-    minute = '0' + minute if len(minute) < 2 else minute
-    hour = str(now.hour)
-    hour = '0' + hour if len(hour) < 2 else hour
+    second = str(now.second).zfill(2)
+    minute = str(now.minute).zfill(2)
+    hour = str(now.hour).zfill(2)
 
 
     time_str = f"{hour}:{minute}:{second}"

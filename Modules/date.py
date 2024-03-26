@@ -8,13 +8,10 @@ def Init(module: main.Module):
 def Update(module: main.Module):
     now = datetime.datetime.now()
 
-    day = str(now.day)
-    day = '0' + day if len(day) < 2 else day
-    month = str(now.month)
-    month = '0' + month if len(month) < 2 else month
-    year = str(now.year)
+    day = str(now.day).zfill(2)
+    month = str(now.month).zfill(2)
+    year = str(now.year).zfill(4)
 
     date_str = f"{day}.{month}.{year}"
 
-    module.full_text = date_str
-
+    module.full_text = date_strB
