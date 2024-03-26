@@ -1,6 +1,7 @@
 import main
 import os
 from requests import get
+# as a replacement for ipify
 # not using the ipify libary because it uses since python 3.8 deprecated functions
 import time
 
