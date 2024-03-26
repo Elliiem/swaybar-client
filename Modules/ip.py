@@ -1,7 +1,7 @@
 import main
 import os
 from requests import get
-# not using the ipify module because it uses since python 3.8 deprecated functions
+# not using the ipify libary because it uses since python 3.8 deprecated functions
 import time
 
 def Init(module: main.Module):
@@ -19,7 +19,7 @@ def Update(module: main.Module):
         os.makedirs(os.path.dirname(last_ip_path), exist_ok=True)
         with open(last_ip_path, 'w') as file2:
             try:
-                response = get('https://api64.ipify.org', timeout=2)
+                response = get('https://api64.ipify.org', timeout=5)
                 response.raise_for_status()  # Raises stored HTTPError, if one occurred.
                 file2.write(response.text)
             except Exception as e:
