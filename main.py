@@ -39,8 +39,6 @@ class Module:
     def __init__(self,
                 name: str,
                 instance: int,
-                update: Callable[['Module'], None],
-                init: Callable[['Module'], None],
                 full_text: str = '',
                 short_text: str = '',
                 color: str = '',
@@ -60,8 +58,6 @@ class Module:
 
         self.name     = name
         self.instance = instance
-        self.update   = update
-        self.init     = init
 
         self.full_text       = full_text
         self.short_text      = short_text
@@ -113,8 +109,7 @@ def CreateInstance(module: pathlib.Path, instances: Dict[pathlib.Path, int], pyt
     else:
         instances[module] = 0
 
-    return Module(python_module.__name__, instances[module], python_module.Update, python_module.Init)
-
+    return python_module.Module(python_module.__name__, instances[module])
 
 def LoadModules(config: Config) -> List[Module]:
     python_modules = LoadPythonModulesFromPath(config.modules_path)
@@ -169,7 +164,7 @@ def GenerateLine(instances: List[Module]) -> str:
 
 def Init(instances: List[Module], config: Config):
     for instance in instances:
-        instance.init(instance)
+        instance.Init()
 
     print(json.dumps(GenerateHeaderDict()))
     print('[' + GenerateLine(instances))
@@ -181,7 +176,7 @@ def Update(instances: List[Module]):
         now = time.time()
 
         if now - instance._update_time > instance.timeout:
-            instance.update(instance)
+            instance.Update()
             instance._update_time = now
 
     print(',' + GenerateLine(instances))

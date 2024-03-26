@@ -2,20 +2,20 @@ import main
 
 import psutil
 
-def Init(module: main.Module):
-    module.color = '000000'
+class Module(main.Module):
+    def Init(self):
+        self.color = '000000'
 
-    module.background = '4040FF'
-    module.border = '4040FF'
+        self.background = '4040FF'
+        self.border = '4040FF'
 
-    module.border_left = 1
-    module.border_right = 1
+        self.border_left = 1
+        self.border_right = 1
 
-    module.separator = False
-    module.sep_block_width = 0
+        self.separator = False
+        self.sep_block_width = 0
 
+    def Update(self):
+        cpu_percent = str(round(psutil.cpu_percent()))
 
-def Update(module: main.Module):
-    cpu_percent = str(round(psutil.cpu_percent()))
-
-    module.full_text = f'cpu: {cpu_percent}%'
+        self.full_text = f'cpu: {cpu_percent}%'
