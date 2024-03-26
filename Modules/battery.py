@@ -13,7 +13,7 @@ def Init(module: main.Module):
     module.border_right = 1
 
     module.separator = False
-    module.separator_block_width = 0
+    module.sep_block_width = 0
 
 
 class ChargeStatus(Enum):
@@ -74,4 +74,4 @@ def Update(module: main.Module):
         module.background = 'FF0000'
         module.border = 'FF0000'
 
-    module.full_text = status_indicator + ' ' + str(battery_percentage) + '%'
+    module.full_text = f'{status_indicator} {str(battery_percentage)}%'

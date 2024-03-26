@@ -1,12 +1,14 @@
-import main
-
 import time
 import os
 
-config_base_dir = os.environ.get('XDG_CONFIG_HOME', '~/.config')
-config_file_path = os.path.join(config_base_dir, 'sway', 'swaybar-client.json')
+import pathlib
 
-config = main.Config.LoadFromPath(os.path.expanduser(config_file_path))
+import main
+
+config_base_dir = pathlib.Path(os.environ.get('XDG_CONFIG_HOME', '~/.config'))
+config_file_path = config_base_dir.joinpath('sway', 'swaybar-client.json').expanduser()
+
+config = main.Config.LoadFromPath(config_file_path)
 
 instances = main.LoadModules(config)
 
@@ -14,4 +16,4 @@ main.Init(instances, config)
 
 while True:
     main.Update(instances)
-    time.sleep(1)
+    time.sleep(0.25)

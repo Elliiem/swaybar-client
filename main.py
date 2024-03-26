@@ -6,36 +6,34 @@ import time
 from typing import List, Callable, Dict
 
 import importlib.util
+import pathlib
+
+MODULES_DEFAULT_PATH = pathlib.Path(__file__).parent.joinpath('Modules')
 
 class Config:
-    def __init__(self, module_dir: str, modules: List[str]) -> None:
-        self.module_dir = module_dir
+    def __init__(self, modules_path: pathlib.Path, modules: List[pathlib.Path]) -> None:
+        self.modules_path = modules_path
         self.modules = modules
 
-
     def LoadFromDict(config: Dict[str, any]) -> 'Config':
-        module_dir = ''
-        if 'modules_directory' in config:
-            module_dir = config['modules_directory']
+        if 'modules_directory' in config and not config['modules_directory'] == '':
+            modules_path = pathlib.Path(config['modules_directory'])
+        else:
+            modules_path = MODULES_DEFAULT_PATH
 
-        if module_dir == '':
-            module_dir = os.path.join(os.path.dirname(__file__), 'Modules')
+        modules = list(map(lambda x: pathlib.Path(x + '.py'), config['modules'] if 'modules' in config else []))
 
-        if not os.path.exists(module_dir):
-            raise Exception("No module directory was found!")
-
-        modules = config['modules'] if 'modules' in config else []
-
-        return Config(
-            module_dir = module_dir,
+        return Config (
+            modules_path = modules_path,
             modules = modules
         )
 
-    def LoadFromPath(path:str) -> 'Config':
-        with open(path) as config_file:
+    def LoadFromPath(path: pathlib.Path) -> 'Config':
+        with path.open('r') as config_file:
             config = json.load(config_file)
 
         return Config.LoadFromDict(config)
+
 
 class Module:
     def __init__(self,
@@ -43,6 +41,8 @@ class Module:
                 instance: int,
                 update: Callable[['Module'], None],
                 init: Callable[['Module'], None],
+                full_text: str = '',
+                short_text: str = '',
                 color: str = '',
                 background: str = '',
                 border: str = '',
@@ -54,61 +54,75 @@ class Module:
                 align: str = 'left',
                 urgent: bool = False,
                 separator: bool = True,
-                separator_block_width: int = 10,
+                sep_block_width: int = 10,
                 markup: str = 'none',
                 timeout = 1.0) -> None:
 
-        self.name = name
+        self.name     = name
         self.instance = instance
+        self.update   = update
+        self.init     = init
 
-        self.full_text = ''
-        self.short_text = ''
-
-        self.color = color
-        self.background = background
-        self.border = border
-        self.border_top = border_top
-        self.border_bottom = border_bottom
-        self.border_left = border_left
-        self.border_right = border_right
-        self.min_width = min_width
-        self.align = align
-        self.urgent = urgent
-        self.separator = separator
-        self.separator_block_width = separator_block_width
-        self.markup = markup
-
-        self.update = update
-        self.init = init
-
-        self.timeout = timeout
+        self.full_text       = full_text
+        self.short_text      = short_text
+        self.color           = color
+        self.background      = background
+        self.border          = border
+        self.border_top      = border_top
+        self.border_bottom   = border_bottom
+        self.border_left     = border_left
+        self.border_right    = border_right
+        self.min_width       = min_width
+        self.align           = align
+        self.urgent          = urgent
+        self.separator       = separator
+        self.sep_block_width = sep_block_width
+        self.markup          = markup
+        self.timeout         = timeout
 
         self._update_time = 0
 
 
-def LoadModule(path: str, instance: int) -> any:
-    if not os.path.exists(path):
-        raise Exception(f"Module {os.path.splitext(os.path.basename(path))[0]} does not exist")
-
-    spec = importlib.util.spec_from_file_location('module', path)
+def LoadPythonModuleFromPath(path: pathlib.Path) -> any:
+    spec = importlib.util.spec_from_file_location(path.stem, path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
 
-    return Module(module.__name__, instance, module.Update, module.Init)
+    return module
 
 
-def LoadModules(config: Config):
-    instance_count = {}
+def LoadPythonModulesFromPath(path: pathlib.Path) -> Dict[pathlib.Path, any]:
+    modules = {}
+
+    module_paths = list(path.glob('**/*.py'))
+
+    for module_path in module_paths:
+        modules[module_path.relative_to(path)] = LoadPythonModuleFromPath(module_path)
+
+    return modules
+
+
+def CreateInstance(module: pathlib.Path, instances: Dict[pathlib.Path, int], python_modules: Dict[pathlib.Path, any]) -> Module:
+    if module in python_modules:
+        python_module = python_modules[module]
+    else:
+        raise Exception(f'Module {module} does not exist')
+
+    if module in instances:
+        instances[module] += 1
+    else:
+        instances[module] = 0
+
+    return Module(python_module.__name__, instances[module], python_module.Update, python_module.Init)
+
+
+def LoadModules(config: Config) -> List[Module]:
+    python_modules = LoadPythonModulesFromPath(config.modules_path)
+    instances = {}
     modules = []
 
-    for rel_path in config.modules:
-        if rel_path in instance_count:
-            instance_count[rel_path] += 1
-        else:
-            instance_count[rel_path] = 0
-
-        module_path = config.module_dir + rel_path + '.py'
-        modules.append(LoadModule(module_path, instance_count[rel_path]))
+    for module in config.modules:
+        modules.append(CreateInstance(module, instances, python_modules))
 
     return modules
 
@@ -131,7 +145,7 @@ def GenerateModuleDict(module: Module):
         'align': module.align,
         'urgent': module.urgent,
         'separator': module.separator,
-        'separator_block_width': module.separator_block_width,
+        'separator_block_width': module.sep_block_width,
         'markup': module.markup
     }
 

@@ -12,7 +12,7 @@ def Init(module: main.Module):
     module.border_right = 1
 
     module.separator = False
-    module.separator_block_width = 0
+    module.sep_block_width = 0
 
 
 def Update(module: main.Module):
