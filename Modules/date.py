@@ -14,4 +14,4 @@ def Update(module: main.Module):
 
     date_str = f"{day}.{month}.{year}"
 
-    module.full_text = date_strB
+    module.full_text = date_str
