@@ -3,7 +3,7 @@ import sys
 import os
 import time
 
-from typing import List, Callable, Dict
+from typing import List, Dict
 
 import importlib.util
 import pathlib
@@ -29,10 +29,13 @@ class Config:
         )
 
     def LoadFromPath(path: pathlib.Path) -> 'Config':
+        if not path.exists():
+            raise Exception('No config file was found, consider adding one at ~/.config/sway/swaybar-client.json')
+
         with path.open('r') as config_file:
             config = json.load(config_file)
 
-        return Config.LoadFromDict(config)
+            return Config.LoadFromDict(config)
 
 
 class Module:
@@ -55,7 +58,6 @@ class Module:
                 sep_block_width: int = 10,
                 markup: str = 'none',
                 timeout = 1.0) -> None:
-
         self.name     = name
         self.instance = instance
 
@@ -97,7 +99,7 @@ def LoadPythonModulesFromPath(path: pathlib.Path) -> Dict[pathlib.Path, any]:
 
     return modules
 
-
+#TODO Handle malformed modules
 def CreateInstance(module: pathlib.Path, instances: Dict[pathlib.Path, int], python_modules: Dict[pathlib.Path, any]) -> Module:
     if module in python_modules:
         python_module = python_modules[module]
@@ -199,7 +201,3 @@ def Main():
     while True:
         Update(instances)
         time.sleep(0.25)
-
-
-if __name__ == '__main__':
-    Main()
