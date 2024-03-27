@@ -1,7 +1,8 @@
-import main
 import psutil
 
 from enum import Enum
+
+import swaybarclient
 
 class ChargeStatus(Enum):
     DISCHARGING = 0,
@@ -19,7 +20,7 @@ class ChargeStatus(Enum):
             return ChargeStatus.NOT_CHARGING
 
 
-class Module(main.Module):
+class Module(swaybarclient.Module):
     def Init(self):
         self.color = '000000'
 
@@ -66,11 +67,11 @@ class Module(main.Module):
         self.full_text = f'{status_indicator} {str(battery_percentage)}%'
 
     def Blink(self):
-        if blink_state:
-            blink_state = False
+        if self.blink_state:
+            self.blink_state = False
             self.background = 'FF0000'
             self.border = 'FF0000'
         else:
-            blink_state = True
+            self.blink_state = True
             self.background = 'FFFFFF'
-            self.border = 'FF0000'
+            self.border = 'FFFFFF'

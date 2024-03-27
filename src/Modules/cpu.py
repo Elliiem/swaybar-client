@@ -1,8 +1,8 @@
-import main
+import swaybarclient
 
 import psutil
 
-class Module(main.Module):
+class Module(swaybarclient.Module):
     def Init(self):
         self.color = '000000'
 

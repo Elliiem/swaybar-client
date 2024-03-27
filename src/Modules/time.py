@@ -1,7 +1,8 @@
-import main
 import datetime
 
-class Module(main.Module):
+import swaybarclient
+
+class Module(swaybarclient.Module):
     def Init(self):
         self.color = '000000'
 

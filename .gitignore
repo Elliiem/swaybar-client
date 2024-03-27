@@ -1,4 +1,5 @@
 __pycache__
-Modules/__pycache__
+src/Swaybar_Client.egg-info
+dist
 .vscode
 .venv

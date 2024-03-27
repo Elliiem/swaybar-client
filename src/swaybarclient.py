@@ -111,6 +111,7 @@ def CreateInstance(module: pathlib.Path, instances: Dict[pathlib.Path, int], pyt
 
     return python_module.Module(python_module.__name__, instances[module])
 
+
 def LoadModules(config: Config) -> List[Module]:
     python_modules = LoadPythonModulesFromPath(config.modules_path)
     instances = {}
@@ -162,6 +163,7 @@ def GenerateLine(instances: List[Module]) -> str:
 
     return json.dumps(out)
 
+
 def Init(instances: List[Module], config: Config):
     for instance in instances:
         instance.Init()
@@ -181,3 +183,23 @@ def Update(instances: List[Module]):
 
     print(',' + GenerateLine(instances))
     sys.stdout.flush()
+
+
+def Main():
+    config_base_dir = pathlib.Path(os.environ.get('XDG_CONFIG_HOME', '~/.config'))
+    config_file_path = config_base_dir.joinpath('sway', 'swaybar-client.json').expanduser()
+
+    config = Config.LoadFromPath(config_file_path)
+
+    instances = LoadModules(config)
+
+    Init(instances, config)
+
+    #TODO React to stop and cont signals, also let modules react to click events
+    while True:
+        Update(instances)
+        time.sleep(0.25)
+
+
+if __name__ == '__main__':
+    Main()
