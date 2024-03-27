@@ -1,5 +1,10 @@
 __pycache__
+
 src/Swaybar_Client.egg-info
+
+build
 dist
-.vscode
+
 .venv
+.vscode
+
