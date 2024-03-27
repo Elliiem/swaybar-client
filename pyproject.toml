@@ -16,4 +16,10 @@ dependencies = ['psutil', 'importlib']
 license = { file = 'LICENSE' }
 
 [project.scripts]
-swaybarclient = "swaybarclient:Main"
+swaybarclient = 'swaybarclient:Main'
+
+[project.urls]
+Repository = 'https://github.com/Elliiem/SwayBar-Client'
+
+[tool.setuptools.package-data]
+swaybarclient = ['swaybar-client-default.json']

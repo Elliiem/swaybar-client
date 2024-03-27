@@ -6,9 +6,13 @@ import time
 from typing import List, Dict
 
 import importlib.util
+from importlib.resources import files, as_file
+
 import pathlib
 
-MODULES_DEFAULT_PATH = pathlib.Path(__file__).parent.joinpath('Modules')
+
+MODULES_DEFAULT_PATH = pathlib.Path(__file__).parent.joinpath('modules')
+
 
 class Config:
     def __init__(self, modules_path: pathlib.Path, modules: List[pathlib.Path]) -> None:
@@ -30,12 +34,14 @@ class Config:
 
     def LoadFromPath(path: pathlib.Path) -> 'Config':
         if not path.exists():
-            raise Exception('No config file was found, consider adding one at ~/.config/sway/swaybar-client.json')
+            raise Exception(f'Config file {path} does not exist')
+        if not path.is_file():
+            raise Exception(f'Config file {path} is not a file')
 
         with path.open('r') as config_file:
             config = json.load(config_file)
 
-            return Config.LoadFromDict(config)
+        return Config.LoadFromDict(config)
 
 
 class Module:
@@ -82,14 +88,24 @@ class Module:
 
 
 def LoadPythonModuleFromPath(path: pathlib.Path) -> any:
+    if not path.exists():
+        raise Exception(f'Python module {path} does not exist')
+    elif not path.is_file():
+        raise Exception(f'Python module {path} is not a file')
+
     spec = importlib.util.spec_from_file_location(path.stem, path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
 
     return module
 
-
+#TODO Let the user define multiple module dirs
 def LoadPythonModulesFromPath(path: pathlib.Path) -> Dict[pathlib.Path, any]:
+    if not path.exists():
+        raise Exception(f'Module directory {path} does not exist')
+    elif not path.is_dir():
+        raise Exception(f'Module directory {path} is not a directory')
+
     modules = {}
 
     module_paths = list(path.glob('**/*.py'))
@@ -104,7 +120,7 @@ def CreateInstance(module: pathlib.Path, instances: Dict[pathlib.Path, int], pyt
     if module in python_modules:
         python_module = python_modules[module]
     else:
-        raise Exception(f'Module {module} does not exist')
+        raise Exception(f'The module {module} was not loaded, perhaps it does not exist')
 
     if module in instances:
         instances[module] += 1
@@ -190,6 +206,10 @@ def Update(instances: List[Module]):
 def Main():
     config_base_dir = pathlib.Path(os.environ.get('XDG_CONFIG_HOME', '~/.config'))
     config_file_path = config_base_dir.joinpath('sway', 'swaybar-client.json').expanduser()
+
+    if not config_file_path.exists():
+        with config_file_path.open('w') as config_file:
+            config_file.write(files('data').joinpath('swaybar-client-default.json').read_text())
 
     config = Config.LoadFromPath(config_file_path)
 
