@@ -3,7 +3,7 @@ requires = ['setuptools']
 build-backend = 'setuptools.build_meta'
 
 [project]
-name = 'Swaybar-Client'
+name = 'swaybar-client'
 version = '0.1.0'
 
 description = 'A swaybar client'
