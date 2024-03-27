@@ -1,0 +1,19 @@
+[build-system]
+requires = ['setuptools']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'Swaybar-Client'
+version = '0.1.0'
+
+description = 'A swaybar client'
+
+authors = [{ name = 'Ellie Lapanje', email = 'ellie.lapanje@gmail.com' }]
+maintainers = [{ name = 'Ellie Lapanje', email = 'ellie.lapanje@gmail.com' }]
+
+dependencies = ['psutil', 'importlib']
+
+license = { file = 'LICENSE' }
+
+[project.scripts]
+swaybarclient = "swaybarclient:Main"
