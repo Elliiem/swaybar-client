@@ -1,7 +1,0 @@
-{
-    "modules_directory": "",
-    "modules": [
-        "time",
-        "battery"
-    ]
-}

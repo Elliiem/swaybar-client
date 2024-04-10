@@ -20,6 +20,3 @@ swaybarclient = 'swaybarclient:Main'
 
 [project.urls]
 Repository = 'https://github.com/Elliiem/swaybar-client'
-
-[tool.setuptools.package-data]
-swaybarclient = ['swaybar-client-default.json']

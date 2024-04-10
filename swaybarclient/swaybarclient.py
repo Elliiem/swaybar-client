@@ -209,8 +209,7 @@ def Main():
 
     if not config_file_path.exists():
         with config_file_path.open('w') as config_file:
-            config_file.write(files('data').joinpath('swaybar-client-default.json').read_text())
-
+            config_file.write('{"modules_directory": "", "modules": ["time", "battery"]}')
     config = Config.LoadFromPath(config_file_path)
 
     instances = LoadModules(config)
