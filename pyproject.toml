@@ -4,7 +4,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'swaybar-client'
-version = '0.1.1'
+version = '1.0.0'
 
 description = 'A swaybar client'
 
@@ -13,7 +13,7 @@ maintainers = [{ name = 'Ellie Lapanje', email = 'ellie.lapanje@gmail.com' }]
 
 dependencies = ['psutil', 'importlib']
 
-license = { file = 'LICENSE' }
+license = { file = 'AGPL-3.0-or-later' }
 
 [project.scripts]
 swaybarclient = 'swaybarclient:Main'
