@@ -13,7 +13,7 @@ maintainers = [{ name = 'Ellie Lapanje', email = 'ellie.lapanje@gmail.com' }]
 
 dependencies = ['psutil', 'importlib']
 
-license = { file = 'AGPL-3.0-or-later' }
+license = { text = 'AGPL-3.0-or-later' }
 
 [project.scripts]
 swaybarclient = 'swaybarclient:Main'
