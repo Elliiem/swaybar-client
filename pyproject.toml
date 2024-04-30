@@ -11,7 +11,7 @@ description = 'A swaybar client'
 authors = [{ name = 'Ellie Lapanje', email = 'ellie.lapanje@gmail.com' }]
 maintainers = [{ name = 'Ellie Lapanje', email = 'ellie.lapanje@gmail.com' }]
 
-dependencies = ['psutil', 'importlib']
+dependencies = ['psutil']
 
 license = { text = 'AGPL-3.0-or-later' }
 
